@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const readFIle = require('./helpers/readFile');
 const randomToken = require('./helpers/generateToken');
 
-/* const loginMiddleware = require('./middlewares/loginMiddleware'); */
+const loginMiddleware = require('./middlewares/loginMiddleware');
 
 const app = express();
 app.use(bodyParser.json());
@@ -44,18 +44,13 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-// requisito 3
-app.post('/login', (req, res) => {
+// requisito 3 e 4
+app.post('/login', loginMiddleware, (req, res) => {
   try {
-    const { email, password } = req.body;
-    if ([email, password].includes(undefined)) {
-      return res.status(400).json({ message: 'Faltando informações.' });
-    }
-  
   const token = randomToken();
-  console.log(token);
+  // console.log(token);
   return res.status(200).json({ token });
   } catch (error) {
-    return res.status(500).end();
+    return res.status(400).send({ message: error });
   }
 });
