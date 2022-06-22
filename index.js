@@ -78,3 +78,24 @@ app.post('/talker', authMiddleware, nameValidation,
     return res.status(400).send({ message: e });
   }
 });
+
+app.put('/talker/:id', authMiddleware, nameValidation, 
+  ageValidation, talkValidation, watchedAtValidation, rateValidation, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, age, talk } = req.body;
+    const talkers = await readFIle();
+    const updateTalker = {
+      id: Number(id),
+      name,
+      age,
+      talk,
+    };
+    const talkerIndex = talkers.findIndex((element) => element.id === Number(id));
+    talkers[talkerIndex] = updateTalker;
+    writeFIle(talkers);
+    res.status(200).json(updateTalker);
+    } catch (e) {
+    return res.status(400).send({ message: e });
+  }
+});
