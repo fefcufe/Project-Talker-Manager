@@ -99,3 +99,15 @@ app.put('/talker/:id', authMiddleware, nameValidation,
     return res.status(400).send({ message: e });
   }
 });
+
+app.delete('/talker/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const talkers = await readFIle();
+    const newArray = talkers.filter((element) => element.id !== Number(id));
+    await writeFIle(newArray);
+    return res.status(204).end();
+  } catch (e) {
+    return res.status(400).send({ message: e });
+  }
+});
