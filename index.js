@@ -1,9 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const readFIle = require('./helpers/readFile');
+const writeFIle = require('./helpers/writeFile');
 const randomToken = require('./helpers/generateToken');
+const authMiddleware = require('./middlewares/tokenMiddleware');
 
 const loginMiddleware = require('./middlewares/loginMiddleware');
+const { nameValidation, ageValidation, 
+  talkValidation, watchedAtValidation, rateValidation } = require('./middlewares/talkerMiddleware');
 
 const app = express();
 app.use(bodyParser.json());
@@ -52,5 +56,25 @@ app.post('/login', loginMiddleware, (req, res) => {
   return res.status(200).json({ token });
   } catch (error) {
     return res.status(400).send({ message: error });
+  }
+});
+
+// requisito 5
+app.post('/talker', authMiddleware, nameValidation, 
+  ageValidation, talkValidation, watchedAtValidation, rateValidation, async (req, res) => {
+  try {
+    const { name, age, talk } = req.body;
+    const talkers = await readFIle(); 
+    const newTalker = {
+      id: talkers.length + 1,
+      name,
+      age,
+      talk,
+    };
+    talkers.push(newTalker);
+    writeFIle(talkers);
+    return res.status(201).json(newTalker);
+  } catch (e) {
+    return res.status(400).send({ message: e });
   }
 });
