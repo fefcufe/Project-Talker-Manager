@@ -24,14 +24,32 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
+// requisito 8
+app.get('/talker/search', authMiddleware, async (req, res) => {
+  try {
+    const { q } = req.query;
+    const talkers = await readFIle();
+    const searchedTalkers = talkers.filter((talker) => talker.name.includes(q));
+    if (!q) {
+      return res.status(200).json(talkers);
+    }
+    if (!searchedTalkers) {
+      return res.status(200).send([]);
+    }
+    return res.status(200).json(searchedTalkers);
+  } catch (e) {
+    res.status(400).json({ message: e });
+  }
+});
+
 // requisito 1
 app.get('/talker', async (req, res) => {
   try {
     const talkersList = await readFIle();
     console.log(talkersList);
     res.status(200).json(talkersList);
-  } catch (error) {
-    res.status(400).json({ message: error });
+  } catch (e) {
+    res.status(400).json({ message: e });
   }
 });
 
